@@ -1,0 +1,7 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+tdd,cat.albirar.daw.tdd,TddException,13,3,0,0,6,2,3,1,3,1
+tdd,cat.albirar.daw.tdd,TddApplication,5,16,0,0,2,5,1,3,1,3
+tdd,cat.albirar.daw.tdd.comptes.impl,ServeiComptesImpl,9,165,3,11,2,40,3,11,0,7
+tdd,cat.albirar.daw.tdd.comptes,SaldoInsuficientException,13,3,0,0,6,2,3,1,3,1
+tdd,cat.albirar.daw.tdd.comptes,LimitDiariTransferenciesExceditExcepcio,13,3,0,0,6,2,3,1,3,1
+tdd,cat.albirar.daw.tdd.comptes,CompteInexistentException,22,0,0,0,6,0,3,0,3,0
