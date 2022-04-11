@@ -18,7 +18,12 @@
  */
 package cat.albirar.daw.tdd.comptes;
 
+import java.math.BigDecimal;
+
 import javax.validation.ValidationException;
+import javax.validation.constraints.Digits;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
 
@@ -37,35 +42,38 @@ public interface IServeiComptes {
 	 * Retorna el saldo del {@code compte} indicat.
 	 * @param compte El compte, requerit
 	 * @return El saldo
-	 * @throws IllegalArgumentException Si el {@code compte} indicat no existeix pas
+	 * @throws CompteInexistentException Si el {@code compte} indicat no existeix pas
 	 */
-	public double saldo(@NotBlank String compte);
+	public BigDecimal saldo(@NotBlank String compte);
 	/**
 	 * Ingressa el {@code total} al compte {@code indicat}.
 	 * @param compte El compte, requerit
 	 * @param total El total a ingressar, sense efectes si és igual o menor que zero
 	 * @return El saldo actual, desprès de l'ingrès
-	 * @throws IllegalArgumentException Si el {@code compte} no existeix pas.
-	 * @throws ValidationException Si {@code compte} és null o no conté almenys un caràcter no espai o si {@code total} és igual o menor que zero
+	 * @throws CompteInexistentException Si el {@code compte} no existeix pas.
+	 * @throws ValidationException Si {@code compte} no és pas vàlid o si {@code total} és igual o menor que zero
 	 */
-	public double ingressar(@NotBlank String compte, @Positive double total);
+	public BigDecimal ingressar(@NotBlank String compte, @Min(0) @Max(6000) @Digits(integer = 12, fraction = 2) BigDecimal total);
 	/**
 	 * Retira el {@code total} al compte {@code indicat}.
 	 * @param compte El compte, requerit
 	 * @param total El total a retirar, sense efectes si és igual o menor que zero
 	 * @return El saldo actual, desprès de la retirada
-	 * @throws IllegalArgumentException Si el {@code compte} no existeix pas.
-	 * @throws ValidationException Si {@code compte} és null o no conté almenys un caràcter no espai o si {@code total} és igual o menor que zero
+	 * @throws CompteInexistentException Si el {@code compte} no existeix pas.
+	 * @throws SaldoInsuficientException Si el saldo del {@code compte} impedeix retirar la quantitat {@code total} indicada
+	 * @throws ValidationException Si {@code compte} no és pas vàlid o si {@code total} és igual o menor que zero
 	 */
-	public double retirar(@NotBlank String compte, @Positive double total);
+	public BigDecimal retirar(@NotBlank String compte, @Min(0) @Max(6000) @Digits(integer = 12, fraction = 2) BigDecimal total);
 	/**
 	 * Transfereix el {@code total} del {@code compteOrigen} al {@code compteDestinacio}.
 	 * @param compteOrigen
 	 * @param compteDestinacio
 	 * @param total El total a transferir, sense efectes si és igual o menor que zero
 	 * @return El saldo del compte de destinació, desprès de la transferència
-	 * @throws IllegalArgumentException Si el {@code compteOrigen} o el {@code compteDestinacio} no existeix pas.
-	 * @throws ValidationException Si qualsevol de {@code compteOrigen} o {@code compteDestinacio} és null o no conté almenys un caràcter no espai o si {@code total} és igual o menor que zero
+	 * @throws CompteInexistentException Si el {@code compteOrigen} o el {@code compteDestinacio} no existeix pas.
+	 * @throws SaldoInsuficientException Si el saldo del {@code compteOrigen} impedeix transferir la quantitat {@code total} indicada
+	 * @throws LimitDiariTransferenciesExceditExcepcio Si s'excedeix el total màxim diari per a transferències
+	 * @throws ValidationException Si qualsevol de {@code compteOrigen} o {@code compteDestinacio} no és pas vàlid o si {@code total} és igual o menor que zero
 	 */
-	public double transferir(@NotBlank String compteOrigen, @NotBlank String compteDestinacio, @Positive double total);
+	public BigDecimal transferir(@NotBlank String compteOrigen, @NotBlank String compteDestinacio, @Positive @Digits(integer = 12, fraction = 2) BigDecimal total);
 }

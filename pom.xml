@@ -1,23 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
+
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>2.6.6</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
+
 	<groupId>cat.albirar.daw</groupId>
 	<artifactId>tdd</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>tdd</name>
 	<description>Projecte per a la UF2 del M5</description>
+
 	<properties>
 		<java.version>1.8</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
 		<lombok-pluginn.version>1.18.20.0</lombok-pluginn.version>
+		<jacoco-plugin.version>0.8.8</jacoco-plugin.version>
 	</properties>
+
+	<developers>
+		<developer>
+			<id>ofornes</id>
+			<name>Octavi Fornés</name>
+			<email>octavi@fornes.cat</email>
+		</developer>
+	</developers>
+
+	<scm>
+		<url>https://github.com/ofornes/daw-m5-uf2</url>
+		<connection>scm:git:https://github.com/ofornes/daw-m5-uf2.git</connection>
+		<developerConnection>scm:git:git@github.com:ofornes/daw-m5-uf2.git</developerConnection>
+	</scm>
+
+	<distributionManagement>
+		<site>
+			<id>github</id>
+			<url>scm:git:git@github.com:ofornes/daw-m5-uf2.git</url>
+		</site>
+	</distributionManagement>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -69,7 +95,72 @@
 					</execution>
 				</executions>
 			</plugin>
+
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>${jacoco-plugin.version}</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+					</execution>
+					<!-- attached to Maven test phase -->
+					<execution>
+						<id>report</id>
+						<phase>test</phase>
+						<goals>
+							<goal>report</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<!--
+				<version>3.0.0-M6</version>
+-->
+				<!--$NO-MVN-MAN-VER$-->
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-site-plugin</artifactId>
+				<version>3.11.0</version>
+				<configuration>
+					<skipDeploy>true</skipDeploy> <!-- don't deploy site with maven-site-plugin -->
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-scm-publish-plugin</artifactId>
+				<version>3.1.0</version>
+				<configuration>
+					<scmBranch>gh-pages</scmBranch>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
+
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-project-info-reports-plugin</artifactId>
+				<version>2.6</version>
+				<reportSets>
+					<reportSet>
+						<reports>
+							<report>dependencies</report>
+							<report>project-team</report>
+							<report>scm</report>
+						</reports>
+					</reportSet>
+				</reportSets>
+			</plugin>
+		</plugins>
+	</reporting>
 
 </project>

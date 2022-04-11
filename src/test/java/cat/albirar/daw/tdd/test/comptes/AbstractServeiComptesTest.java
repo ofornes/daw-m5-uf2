@@ -18,37 +18,21 @@
  */
 package cat.albirar.daw.tdd.test.comptes;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.util.StringUtils;
+import org.springframework.test.annotation.DirtiesContext;
 
 import cat.albirar.daw.tdd.comptes.IServeiComptes;
 
 /**
- * Provatures del servei {@link IServeiComptes}.
+ * Arrel per a les provatures de {@link IServeiComptes}.
  * @author Octavi Forn&eacute;s <mailto:ofornes@albirar.cat[]>
  * @since 0.0.1
  */
 @SpringBootTest
-public class ServeiComptesTest {
+@DirtiesContext
+public abstract class AbstractServeiComptesTest {
 	@Autowired
-	private IServeiComptes serveiComptes;
-	/**
-	 * Quan creem el compte el saldo és zero.
-	 */
-	@Test public void whenCrearCompte_Then_AValidCompteIsGetAndSaldoIsZero() {
-		String id;
-		
-		id = serveiComptes.crearCompte();
-		// Creació vàlid
-		assertNotNull(id);
-		assertTrue(StringUtils.hasText(id));
-		// Saldo == 0
-		assertEquals(0D, serveiComptes.saldo(id));
-	}
+	protected IServeiComptes serveiComptes;
+
 }

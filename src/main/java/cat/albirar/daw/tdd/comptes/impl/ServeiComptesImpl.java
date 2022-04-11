@@ -18,12 +18,28 @@
  */
 package cat.albirar.daw.tdd.comptes.impl;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.Collections;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.UUID;
+
+import javax.annotation.PostConstruct;
+import javax.validation.constraints.Digits;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
+import cat.albirar.daw.tdd.comptes.CompteInexistentException;
 import cat.albirar.daw.tdd.comptes.IServeiComptes;
+import cat.albirar.daw.tdd.comptes.SaldoInsuficientException;
+import cat.albirar.daw.tdd.comptes.LimitDiariTransferenciesExceditExcepcio;
 
 /**
  * Implementació de {@link IServeiComptes}.
@@ -31,50 +47,110 @@ import cat.albirar.daw.tdd.comptes.IServeiComptes;
  * @since 0.0.1
  */
 @Service
+@Validated
 public class ServeiComptesImpl implements IServeiComptes {
-
+	private Map<String, BigDecimal> comptes = null;
+	private Map<LocalDate, Map<String, BigDecimal>> transferencies;
+	
+	@Value("${tdd.maxTransferencies:3000}")
+	protected BigDecimal MAX_TOTAL_TRANSFERENCIES;
+	/**
+	 * Inicialitza el servei, si no estava inicialitzat.
+	 */
+	@PostConstruct
+	public void inicialitzarServei() {
+		if(comptes == null) {
+			comptes = Collections.synchronizedMap(new TreeMap<>());
+			transferencies = Collections.synchronizedMap(new TreeMap<>());
+		}
+	}
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public String crearCompte() {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException();
+		String id;
+		
+		id = UUID.randomUUID().toString();
+		comptes.put(id, BigDecimal.ZERO);
+		return id;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public double saldo(@NotBlank String compte) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException();
+	public BigDecimal saldo(@NotBlank String compte) {
+		BigDecimal s;
+		
+		s = comptes.get(compte);
+		if(s == null) {
+			throw new CompteInexistentException(compte);
+		}
+		return s;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public double ingressar(@NotBlank String compte, @Positive double total) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException();
+	public BigDecimal ingressar(@NotBlank String compte, @Min(0) @Max(6000) @Digits(integer = 12, fraction = 2) BigDecimal total) {
+		BigDecimal s;
+		
+		s = saldo(compte);
+		s = s.add(total);
+		comptes.put(compte, s);
+		return s;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public double retirar(@NotBlank String compte, @Positive double total) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException();
+	public BigDecimal retirar(@NotBlank String compte, @Min(0) @Max(6000) @Digits(integer = 12, fraction = 2) BigDecimal total) {
+		BigDecimal s;
+		
+		s = saldo(compte);
+		if(s.compareTo(total) < 0) {
+			throw new SaldoInsuficientException();
+		}
+		s = s.subtract(total);
+		comptes.put(compte, s);
+		return s;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public double transferir(@NotBlank String compteOrigen, @NotBlank String compteDestinacio, @Positive double total) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException();
+	public BigDecimal transferir(@NotBlank String compteOrigen, @NotBlank String compteDestinacio, @Positive @Digits(integer = 12, fraction = 2) BigDecimal total) {
+		BigDecimal s1, s2, sAvui;
+		LocalDate data;
+		Map<String, BigDecimal> tAvui;
+		
+		s1 = saldo(compteOrigen);
+		s2 = saldo(compteDestinacio);
+		if(s1.compareTo(total) < 0) {
+			throw new SaldoInsuficientException();
+		}
+		data = LocalDate.now();
+		if( (tAvui = transferencies.get(data)) == null) {
+			tAvui = Collections.synchronizedMap(new TreeMap<>());
+			transferencies.put(data, tAvui);
+		}
+		if( (sAvui = tAvui.get(compteOrigen)) == null) {
+			sAvui = BigDecimal.ZERO;
+		}
+		sAvui = sAvui.add(total);
+		if(MAX_TOTAL_TRANSFERENCIES.compareTo(sAvui) < 0) {
+			// Total assolit
+			throw new LimitDiariTransferenciesExceditExcepcio();
+		}
+		tAvui.put(compteOrigen, sAvui);
+		s1 = s1.subtract(total);
+		s2 = s2.add(total);
+		comptes.put(compteOrigen, s1);
+		comptes.put(compteDestinacio, s2);
+		return s2;
 	}
 }
