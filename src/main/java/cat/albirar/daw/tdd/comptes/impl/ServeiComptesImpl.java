@@ -36,6 +36,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import cat.albirar.daw.tdd.comptes.CompteBean;
 import cat.albirar.daw.tdd.comptes.CompteInexistentException;
 import cat.albirar.daw.tdd.comptes.IServeiComptes;
 import cat.albirar.daw.tdd.comptes.SaldoInsuficientException;
@@ -49,7 +50,7 @@ import cat.albirar.daw.tdd.comptes.LimitDiariTransferenciesExceditExcepcio;
 @Service
 @Validated
 public class ServeiComptesImpl implements IServeiComptes {
-	private Map<String, BigDecimal> comptes = null;
+	private Map<String, CompteBean> comptes = null;
 	private Map<LocalDate, Map<String, BigDecimal>> transferencies;
 	
 	@Value("${tdd.maxTransferencies:3000}")
@@ -68,7 +69,7 @@ public class ServeiComptesImpl implements IServeiComptes {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String crearCompte() {
+	public CompteBean crearCompte() {
 		String id;
 		
 		id = UUID.randomUUID().toString();
@@ -80,21 +81,7 @@ public class ServeiComptesImpl implements IServeiComptes {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public BigDecimal saldo(@NotBlank String compte) {
-		BigDecimal s;
-		
-		s = comptes.get(compte);
-		if(s == null) {
-			throw new CompteInexistentException(compte);
-		}
-		return s;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public BigDecimal ingressar(@NotBlank String compte, @Min(0) @Max(6000) @Digits(integer = 12, fraction = 2) BigDecimal total) {
+	public CompteBean ingressar(@NotBlank String compte, @Min(0) @Max(600000) int total) {
 		BigDecimal s;
 		
 		s = saldo(compte);
@@ -107,7 +94,7 @@ public class ServeiComptesImpl implements IServeiComptes {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public BigDecimal retirar(@NotBlank String compte, @Min(0) @Max(6000) @Digits(integer = 12, fraction = 2) BigDecimal total) {
+	public CompteBean retirar(@NotBlank String compte, @Min(0) @Max(600000) int total) {
 		BigDecimal s;
 		
 		s = saldo(compte);
@@ -123,7 +110,7 @@ public class ServeiComptesImpl implements IServeiComptes {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public BigDecimal transferir(@NotBlank String compteOrigen, @NotBlank String compteDestinacio, @Positive @Digits(integer = 12, fraction = 2) BigDecimal total) {
+	public CompteBean transferir(@NotBlank String compteOrigen, @NotBlank String compteDestinacio, @Min(0) @Max(600000) int total) {
 		BigDecimal s1, s2, sAvui;
 		LocalDate data;
 		Map<String, BigDecimal> tAvui;

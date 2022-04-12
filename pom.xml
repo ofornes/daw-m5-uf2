@@ -19,7 +19,7 @@
 		<java.version>1.8</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-		<lombok-pluginn.version>1.18.20.0</lombok-pluginn.version>
+		<lombok-plugin.version>1.18.20.0</lombok-plugin.version>
 		<jacoco-plugin.version>0.8.8</jacoco-plugin.version>
 	</properties>
 
@@ -84,7 +84,7 @@
 			<plugin>
 				<groupId>org.projectlombok</groupId>
 				<artifactId>lombok-maven-plugin</artifactId>
-				<version>${lombok-pluginn.version}</version>
+				<version>${lombok-plugin.version}</version>
 				<executions>
 					<execution>
 						<id>generate-sources</id>
