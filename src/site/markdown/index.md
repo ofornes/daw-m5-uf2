@@ -2,6 +2,14 @@
 
 *Desenvolupament TDD i refactoring de codi.*
 
+**Continguts**
+
+1. [Introducció](#Introducci.C3.B3)
+2. [Estructura](#Estructura)
+3. [Construcció i provatures](#Construcci.C3.B3_i_provatures)
+4. [Primera part de la prova](#Primera_part_de_la_prova)
+    1. [Proves addicionals](#Proves_addicionals)
+
 ------
 
 ## Introducció
@@ -51,14 +59,16 @@ Heu d'utilitzar maven:
 mvn clean install
 ```
 
+Així es generarà el codi i s'executaran les provatures
+
 ## Primera part de la prova
 
 **Requeriments del sistema:**
 
-- Creació d'un compte corrent.
+- Creació d'un compte corrent ([cat.albirar.daw.tdd.test.comptes.ServeiComptesCreacioTest](testapidocs/cat/albirar/daw/tdd/test/comptes/ServeiComptesCreacioTest.html))
     - Els comptes sempre es creen amb saldo 0. Hi ha que fer algun ingrés després si es vol tenir saldo.
         - **Quan creem el compte el saldo és zero.**
-- Ingressos.
+- Ingressos ([cat.albirar.daw.tdd.test.comptes.ServeiComptesIngressosTest](testapidocs/cat/albirar/daw/tdd/test/comptes/ServeiComptesIngressosTest.html))
     - Sumen la quantitat ingressada al saldo.
     - No hi ha comissions ni res per l'estil.
         - **Quan ingressem 100 en un compte buit, el saldo és 100**
@@ -72,7 +82,7 @@ mvn clean install
     - La quantitat màxima que es pot ingressar és de 6000
         - **Si ingressem 6000.00 en un compte buit, el saldo és de 6000.00**
         - **Si ingressem 6000.01 en un compte buit, el saldo és de 0**
-- Retirades.
+- Retirades ([cat.albirar.daw.tdd.test.comptes.ServeiComptesRetiradesTest](testapidocs/cat/albirar/daw/tdd/test/comptes/ServeiComptesRetiradesTest.html))
     - Resten la quantitat que es passa com a paràmetre del saldo.
     - No hi ha comissions ni res per l'estil.
         - **Quan retirem 100 en un compte amb 500, el saldo és 400**
@@ -86,7 +96,7 @@ mvn clean install
     - La quantitat màxima que es pot retirar és de 6000
         - **Si retirem 6000.00 d'un compte amb 7000, el saldo és de 1000**
         - **Si retirem 6000.01 en un compte amb 7000, no ocurre nada i el saldo continua sent 7000**
-- Transferències
+- Transferències ([cat.albirar.daw.tdd.test.comptes.ServeiComptesTransferenciesTest](testapidocs/cat/albirar/daw/tdd/test/comptes/ServeiComptesTransferenciesTest.html))
     - **Si fem una transferència de 100 des d'un compte amb 500 a un amb 50, en el primer compte el saldo serà de 400 i en la segona serà de 150**
     - No es poden transferir quantitats negatives
         - **Si fem una transferència de -100 des d'un compte amb 500 a un amb 50, els saldos es queden amb 500 i 50 respectivament**
@@ -95,3 +105,14 @@ mvn clean install
         - **Si fem una transferència de 3000.01 des d'un compte amb 3500 a un compte amb 50, en el primer compte es quedaran 3500 i en el segon 50**
         - **Si fem una transferència de 2000 des d'un compte amb 3500 a un compte amb 50 i just després una altra de 1200, en el primer compte el saldo quedarà en 1500 i en la segona en 2050**
 
+### Proves addicionals
+
+A la vista dels resultat de la prova de cobertura de codi del servei [ServeiComptesImpl](jacoco/cat.albirar.daw.tdd.comptes.impl/ServeiComptesImpl.html), els valors de cobertura de [saldo](jacoco/cat.albirar.daw.tdd.comptes.impl/ServeiComptesImpl.java.html#L86) i [transferir](jacoco/cat.albirar.daw.tdd.comptes.impl/ServeiComptesImpl.java.html#L131), aconsellan afegir algunes provatures purament orgàniques, que tenen a veure amb la implementació del servei i no pas amb la especificació inicial del mateix. En concret:
+ - Amb un id de compte inexistent:
+    - Demanar saldo
+    - Ingressar
+    - Retirar
+    - Transferir (en ambdòs sentits)
+ - Transferir quantitat superior al saldo del compte origen
+
+Amb aquestes noves provatures, el codi del servei estaria completament cobert i podem tenir la seguretat que totes les situacions estan previstes.
