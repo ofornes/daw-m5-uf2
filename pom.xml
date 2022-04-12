@@ -33,14 +33,14 @@
 
 	<scm>
 		<url>https://github.com/ofornes/daw-m5-uf2</url>
-		<connection>scm:git:https://github.com/ofornes/daw-m5-uf2.git</connection>
-		<developerConnection>scm:git:git@github.com:ofornes/daw-m5-uf2.git</developerConnection>
+		<connection>scm:git:https://github.octavi.com/ofornes/daw-m5-uf2.git</connection>
+		<developerConnection>scm:git:git@github.octavi.com:ofornes/daw-m5-uf2.git</developerConnection>
 	</scm>
 
 	<distributionManagement>
 		<site>
 			<id>github</id>
-			<url>scm:git:git@github.com:ofornes/daw-m5-uf2.git</url>
+			<url>scm:git:git@github.octavi.com:ofornes/daw-m5-uf2.git</url>
 		</site>
 	</distributionManagement>
 
@@ -119,10 +119,6 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
-				<!--
-				<version>3.0.0-M6</version>
--->
-				<!--$NO-MVN-MAN-VER$-->
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -144,23 +140,40 @@
 		</plugins>
 	</build>
 
+	<!-- Report configuration -->
 	<reporting>
 		<plugins>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-project-info-reports-plugin</artifactId>
-				<version>2.6</version>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
 				<reportSets>
 					<reportSet>
 						<reports>
-							<report>dependencies</report>
-							<report>project-team</report>
-							<report>scm</report>
+							<!-- select non-aggregate reports -->
+							<report>report</report>
 						</reports>
 					</reportSet>
 				</reportSets>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-changes-plugin</artifactId>
+				<version>2.12.1</version>
+				<configuration>
+					<skip>true</skip>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-report-plugin</artifactId>
+				<version>3.0.0-M6</version>
+			</plugin>
 		</plugins>
 	</reporting>
+
 
 </project>

@@ -4,7 +4,7 @@
 
 ------
 
-##Introducció
+## Introducció
 
 Per a resoldre la prova UF2, s’ha creat un projecte Java amb maven.
 
@@ -43,5 +43,13 @@ La estructura del projecte és la següent:
    * Retirades: `ServeiComptesRetiradesTest`
    * Transferències: `ServeiComptesTransferenciesTest`
 
-##Construcció i provatures
+## Construcció i provatures
+
+Heu d'utilitzar maven:
+
+```
+mvn clean install
+```
+
+
 
