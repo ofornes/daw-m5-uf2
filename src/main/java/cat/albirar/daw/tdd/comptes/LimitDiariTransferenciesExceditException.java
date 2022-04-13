@@ -26,30 +26,13 @@ import cat.albirar.daw.tdd.TddException;
  * @since 0.0.1
  */
 @SuppressWarnings("serial")
-public class LimitDiariTransferenciesExceditExcepcio extends TddException {
+public class LimitDiariTransferenciesExceditException extends TddException {
 	/**
-	 * Constructor heretat.
+	 * Constructor únic
+	 * @param idCompte L'id del compte
+	 * @param maximDiari El màxim diari
 	 */
-	public LimitDiariTransferenciesExceditExcepcio() {
-		super();
+	public LimitDiariTransferenciesExceditException(String idCompte, int maximDiari) {
+		super(String.format("El compte '%s' no pot efectuar la transferència pel límit diari de '%d'", idCompte, maximDiari));
 	}
-	/**
-	 * Constructor heretat.
-	 */
-	public LimitDiariTransferenciesExceditExcepcio(String message) {
-		super(message);
-	}
-	/**
-	 * Constructor heretat.
-	 */
-	public LimitDiariTransferenciesExceditExcepcio(Throwable cause) {
-		super(cause);
-	}
-	/**
-	 * Constructor heretat.
-	 */
-	public LimitDiariTransferenciesExceditExcepcio(String message, Throwable cause) {
-		super(message, cause);
-	}
-
 }

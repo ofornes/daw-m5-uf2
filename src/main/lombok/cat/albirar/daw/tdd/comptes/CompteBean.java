@@ -18,6 +18,11 @@
  */
 package cat.albirar.daw.tdd.comptes;
 
+import java.math.BigDecimal;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Positive;
+
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
@@ -33,6 +38,23 @@ import lombok.experimental.SuperBuilder;
 @ToString
 @EqualsAndHashCode
 public class CompteBean {
+	/**
+	 * Identificador del compte
+	 * @return L'identificador
+	 */
+	@NotBlank
 	private String idCompte;
-	private int amount;
+	/**
+	 * Saldo del compte en cèntims
+	 * @return El saldo en cèntims
+	 */
+	@Positive
+	int amount;
+	/**
+	 * Saldo del compte en euros.
+	 * @return El saldo en euros
+	 */
+	public BigDecimal getSaldoEuros() {
+		return BigDecimal.valueOf(((double)amount)/100D);
+	}
 }

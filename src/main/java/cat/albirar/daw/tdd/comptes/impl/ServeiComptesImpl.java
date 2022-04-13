@@ -19,7 +19,6 @@
 package cat.albirar.daw.tdd.comptes.impl;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
@@ -30,7 +29,6 @@ import javax.validation.constraints.Digits;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Positive;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -38,23 +36,24 @@ import org.springframework.validation.annotation.Validated;
 
 import cat.albirar.daw.tdd.comptes.CompteBean;
 import cat.albirar.daw.tdd.comptes.CompteInexistentException;
+import cat.albirar.daw.tdd.comptes.CompteOperatiuBean;
 import cat.albirar.daw.tdd.comptes.IServeiComptes;
-import cat.albirar.daw.tdd.comptes.SaldoInsuficientException;
-import cat.albirar.daw.tdd.comptes.LimitDiariTransferenciesExceditExcepcio;
 
 /**
  * Implementació de {@link IServeiComptes}.
  * @author Octavi Forn&eacute;s <mailto:ofornes@albirar.cat[]>
  * @since 0.0.1
+ * @since 1.0.0
  */
 @Service
 @Validated
 public class ServeiComptesImpl implements IServeiComptes {
-	private Map<String, CompteBean> comptes = null;
-	private Map<LocalDate, Map<String, BigDecimal>> transferencies;
+	private Map<String, CompteOperatiuBean> comptes = null;
 	
 	@Value("${tdd.maxTransferencies:3000}")
 	protected BigDecimal MAX_TOTAL_TRANSFERENCIES;
+	
+	private BigDecimal D_100 = BigDecimal.valueOf(100D);
 	/**
 	 * Inicialitza el servei, si no estava inicialitzat.
 	 */
@@ -62,7 +61,6 @@ public class ServeiComptesImpl implements IServeiComptes {
 	public void inicialitzarServei() {
 		if(comptes == null) {
 			comptes = Collections.synchronizedMap(new TreeMap<>());
-			transferencies = Collections.synchronizedMap(new TreeMap<>());
 		}
 	}
 	/**
@@ -71,73 +69,77 @@ public class ServeiComptesImpl implements IServeiComptes {
 	@Override
 	public CompteBean crearCompte() {
 		String id;
+		CompteBean c;
 		
 		id = UUID.randomUUID().toString();
-		comptes.put(id, BigDecimal.ZERO);
-		return id;
+		c = CompteBean.builder().idCompte(id).amount(0).build();
+		comptes.put(id, CompteOperatiuBean.builder().compte(c).build());
+		return c;
+	}
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public CompteBean cercarCompte(@NotBlank String idCompte) {
+		return cercarCompteOperatiu(idCompte).getCompte();
+	}
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public BigDecimal saldo(@NotBlank String idCompte) {
+		return cercarCompte(idCompte).getSaldoEuros();
+	}
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public CompteBean ingressar(@NotBlank String compte, @Min(0) @Max(6000) @Digits(integer = 12, fraction = 2) BigDecimal total) {
+		CompteOperatiuBean c;
+		
+		c = cercarCompteOperatiu(compte);
+		c.sumarSaldo(total.multiply(D_100).intValue());
+		return c.getCompte();
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public CompteBean ingressar(@NotBlank String compte, @Min(0) @Max(600000) int total) {
-		BigDecimal s;
+	public CompteBean retirar(@NotBlank String compte, @Min(0) @Max(6000) @Digits(integer = 12, fraction = 2) BigDecimal total) {
+		CompteOperatiuBean c;
 		
-		s = saldo(compte);
-		s = s.add(total);
-		comptes.put(compte, s);
-		return s;
+		c = cercarCompteOperatiu(compte);
+		c.restarSaldo(total.multiply(D_100).intValue());
+		return c.getCompte();
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public CompteBean retirar(@NotBlank String compte, @Min(0) @Max(600000) int total) {
-		BigDecimal s;
+	public CompteBean transferir(@NotBlank String compteOrigen, @NotBlank String compteDestinacio, @Min(0) @Max(6000) @Digits(integer = 12, fraction = 2) BigDecimal total) {
+		CompteOperatiuBean cOrig, cDest;
 		
-		s = saldo(compte);
-		if(s.compareTo(total) < 0) {
-			throw new SaldoInsuficientException();
-		}
-		s = s.subtract(total);
-		comptes.put(compte, s);
-		return s;
+		cOrig = cercarCompteOperatiu(compteOrigen);
+		cDest = cercarCompteOperatiu(compteDestinacio);
+		cOrig.transferirSaldo(total.multiply(D_100).intValue(), MAX_TOTAL_TRANSFERENCIES.multiply(D_100).intValue());
+		cDest.sumarSaldo(total.multiply(D_100).intValue());
+		return cDest.getCompte();
 	}
-
 	/**
-	 * {@inheritDoc}
+	 * Cerca el compte operatiu associat amb l'{@code idCompte} indicat.
+	 * @param idCompte L'id de compte
+	 * @return El compte operatiu
+	 * @throws CompteInexistentException Si el compte no existeix pas
 	 */
-	@Override
-	public CompteBean transferir(@NotBlank String compteOrigen, @NotBlank String compteDestinacio, @Min(0) @Max(600000) int total) {
-		BigDecimal s1, s2, sAvui;
-		LocalDate data;
-		Map<String, BigDecimal> tAvui;
+	private CompteOperatiuBean cercarCompteOperatiu(String idCompte) {
+		CompteOperatiuBean r;
 		
-		s1 = saldo(compteOrigen);
-		s2 = saldo(compteDestinacio);
-		if(s1.compareTo(total) < 0) {
-			throw new SaldoInsuficientException();
+		r = comptes.get(idCompte);
+		if(r == null) {
+			throw new CompteInexistentException(idCompte);
 		}
-		data = LocalDate.now();
-		if( (tAvui = transferencies.get(data)) == null) {
-			tAvui = Collections.synchronizedMap(new TreeMap<>());
-			transferencies.put(data, tAvui);
-		}
-		if( (sAvui = tAvui.get(compteOrigen)) == null) {
-			sAvui = BigDecimal.ZERO;
-		}
-		sAvui = sAvui.add(total);
-		if(MAX_TOTAL_TRANSFERENCIES.compareTo(sAvui) < 0) {
-			// Total assolit
-			throw new LimitDiariTransferenciesExceditExcepcio();
-		}
-		tAvui.put(compteOrigen, sAvui);
-		s1 = s1.subtract(total);
-		s2 = s2.add(total);
-		comptes.put(compteOrigen, s1);
-		comptes.put(compteDestinacio, s2);
-		return s2;
+		return r;
 	}
 }

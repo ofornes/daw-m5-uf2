@@ -9,6 +9,8 @@
 3. [Construcció i provatures](#Construcci.C3.B3_i_provatures)
 4. [Primera part de la prova](#Primera_part_de_la_prova)
     1. [Proves addicionals](#Proves_addicionals)
+5. [Segona part de la prova](#Segona_part_de_la_prova)
+    1. [Conclusions](#Conclusions)
 
 ------
 
@@ -17,6 +19,9 @@
 Per a resoldre la prova UF2, s’ha creat un projecte Java amb maven.
 
 S’ha utilitzat Spring com a framework de desenvolupament per tal d’aprofitar els recursos i facilitats que proporciona (IoC, Dependency Injection, etc.)
+
+Per a crear els JavaBeans s'ha utilitzat la llibreria [Lombok](https://projectlombok.org/) que simplifica la implementació i redueix els errors típics de la farragosa i mecànica feina de implementar getters i setters.
+Aquesta utilitat disposa d'un _plugin_ per a diferents IDEs de manera que disposes dels mètodes d'accés a les propietats _on the fly_.
 
 ## Estructura
 
@@ -116,3 +121,23 @@ A la vista dels resultat de la prova de cobertura de codi del servei [ServeiComp
  - Transferir quantitat superior al saldo del compte origen
 
 Amb aquestes noves provatures, el codi del servei estaria completament cobert i podem tenir la seguretat que totes les situacions estan previstes.
+
+
+## Segona part de la prova
+
+S'ha creat la classe [CompteBean](apidocs/cat/albirar/daw/tdd/comptes/CompteBean.html) com a _bean immutable_. El saldo s'obté en cèntims, però també s'afegeix un mètode per a obtenir-ho en Euros (tot dividint `amount` entre 100).
+
+S'ha mantingut la estructura del servei, però afegint el [CompteBean](apidocs/cat/albirar/daw/tdd/comptes/CompteBean.html) als valors de retorn dels mètodes que abans retornaven saldos o identificadors de compte.
+
+S'ha creat ka classe especial [CompteOperatiuBean](apidocs/cat/albirar/daw/tdd/comptes/CompteOperatiuBean.html) per a operar sobre el saldo de [CompteBean](apidocs/cat/albirar/daw/tdd/comptes/CompteBean.html) (recordem que és immutable ja que és la _visible_ per al client de l'API).
+Aquest bean especial permet al servei operar sobre el saldo d'un compte i implementa alguna part de la lògica de negoci (per exemple el límit màxim de transferència diària).
+
+
+Les provatures s'han adaptat a aquests petits canvis, però la essència s'ha mantingut.
+
+### Conclusions
+
+Les proves de covertura demostren que la refactorització, amb pocs canvis a les provatures i serveis, han encapsulat millor el funcionament del servei, ja que s'observa un augment del codi covert sense canvis en les provatures.
+
+El disseny d'encapsulament desenvolupat a la segona part, és el més adient als principis OOP.
+

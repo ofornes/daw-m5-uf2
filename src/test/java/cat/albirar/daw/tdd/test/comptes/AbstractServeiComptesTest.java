@@ -18,6 +18,8 @@
  */
 package cat.albirar.daw.tdd.test.comptes;
 
+import java.math.BigDecimal;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
@@ -34,5 +36,6 @@ import cat.albirar.daw.tdd.comptes.IServeiComptes;
 public abstract class AbstractServeiComptesTest {
 	@Autowired
 	protected IServeiComptes serveiComptes;
+	public static final BigDecimal VALOR_ZERO = BigDecimal.valueOf(0.0D);
 
 }

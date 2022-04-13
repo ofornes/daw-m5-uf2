@@ -27,6 +27,7 @@ import javax.validation.ValidationException;
 
 import org.junit.jupiter.api.Test;
 
+import cat.albirar.daw.tdd.comptes.CompteBean;
 import cat.albirar.daw.tdd.comptes.IServeiComptes;
 
 /**
@@ -40,78 +41,78 @@ public class ServeiComptesIngressosTest extends AbstractServeiComptesTest {
 	 * Quan ingressem 100 en un compte buit, el saldo és 100.
 	 */
 	@Test public void quanIngressem100EnUnCompteBuit_ElSaldoEs100() {
-		String id;
+		CompteBean compte;
 		
-		id = serveiComptes.crearCompte();
-		assertEquals(BigDecimal.valueOf(100D), serveiComptes.ingressar(id, BigDecimal.valueOf(100D)));
+		compte = serveiComptes.crearCompte();
+		assertEquals(BigDecimal.valueOf(100D), serveiComptes.ingressar(compte.getIdCompte(), BigDecimal.valueOf(100D)).getSaldoEuros());
 	}
 	/**
 	 * Quan ingressem 100 en un compte buit, el saldo és 100.
 	 */
 	@Test public void quanIngressem3000EnUnCompteBuit_ElSaldoEs_100 (){
-		String id;
+		CompteBean compte;
 		
-		id = serveiComptes.crearCompte();
-		assertEquals(BigDecimal.valueOf(3000D), serveiComptes.ingressar(id, BigDecimal.valueOf(3000D)));
+		compte = serveiComptes.crearCompte();
+		assertEquals(BigDecimal.valueOf(3000D), serveiComptes.ingressar(compte.getIdCompte(), BigDecimal.valueOf(3000D)).getSaldoEuros());
 	}
 	
 	/**
 	 * Quan ingressem 3000 en un compte amb 100, el saldo és de 3100.
 	 */
 	@Test public void quanIngressem3000EnUnCompteAmb100_ElSaldoEsDe3100() {
-		String id;
+		CompteBean compte;
 		
-		id = serveiComptes.crearCompte();
-		serveiComptes.ingressar(id, BigDecimal.valueOf(100D));
-		assertEquals(BigDecimal.valueOf(3100D), serveiComptes.ingressar(id, BigDecimal.valueOf(3000D)));
+		compte = serveiComptes.crearCompte();
+		serveiComptes.ingressar(compte.getIdCompte(), BigDecimal.valueOf(100D));
+		assertEquals(BigDecimal.valueOf(3100D), serveiComptes.ingressar(compte.getIdCompte(), BigDecimal.valueOf(3000D)).getSaldoEuros());
 	}
 	/**
 	 * Quan ingressem -100 en un compte buit, es saldo segueix sent 0.
 	 */
 	@Test public void quanIngressem100NegatiusEnUnCompteBuit_ElSaldoSegueixSent0() {
-		String id;
+		CompteBean compte;
 		
-		id = serveiComptes.crearCompte();
-		assertThrows(ValidationException.class, () -> serveiComptes.ingressar(id, BigDecimal.valueOf(-100D)));
-		assertEquals(BigDecimal.ZERO, serveiComptes.saldo(id));
+		compte = serveiComptes.crearCompte();
+		assertThrows(ValidationException.class, () -> serveiComptes.ingressar(compte.getIdCompte(), BigDecimal.valueOf(-100D)));
+		assertEquals(VALOR_ZERO, serveiComptes.saldo(compte.getIdCompte()));
 	}
 	/**
 	 * Quan ingressem 100.45 en un compte buit, el saldo és de 100.45.
 	 */
 	@Test public void quanIngressem100Punt45EnUnCompteBuit_ElSaldoEsDe100Punt45() {
-		String id;
+		CompteBean compte;
 		
-		id = serveiComptes.crearCompte();
-		assertEquals(BigDecimal.valueOf(100.45D), serveiComptes.ingressar(id, BigDecimal.valueOf(100.45D)));
+		compte = serveiComptes.crearCompte();
+		assertEquals(BigDecimal.valueOf(100.45D), serveiComptes.ingressar(compte.getIdCompte(), BigDecimal.valueOf(100.45D)).getSaldoEuros());
 	}
 	/**
 	 * Si ingressem 100.457 en un compte buit, el saldo és zero
 	 */
 	@Test public void siIngressem100Punt457EnUnCompteBuit_ElSaldoEsZero() {
-		String id;
+		CompteBean compte;
 		
-		id = serveiComptes.crearCompte();
-		assertThrows(ValidationException.class, () -> serveiComptes.ingressar(id, BigDecimal.valueOf(100.457D)));
-		assertEquals(BigDecimal.ZERO, serveiComptes.saldo(id));
+		compte = serveiComptes.crearCompte();
+		assertThrows(ValidationException.class, () -> serveiComptes.ingressar(compte.getIdCompte(), BigDecimal.valueOf(100.457D)));
+		assertEquals(VALOR_ZERO, serveiComptes.saldo(compte.getIdCompte()));
 	}
 	/**
 	 * Si ingressem 6000.00 en un compte buit, el saldo és de 6000.00.
 	 */
 	@Test public void siIngressem6000Punt00EnUnCompteBuit_ElSaldoEs6000Punt00() {
-		String id;
+		CompteBean compte;
 		
-		id = serveiComptes.crearCompte();
-		assertEquals(BigDecimal.valueOf(6000.00D), serveiComptes.ingressar(id, BigDecimal.valueOf(6000.00D)));
+		compte = serveiComptes.crearCompte();
+		assertEquals(BigDecimal.valueOf(6000.00D), serveiComptes.ingressar(compte.getIdCompte(), BigDecimal.valueOf(6000.00D)).getSaldoEuros());
 	}
 	/**
 	 * Si ingressem 6000.01 en un compte buit, el saldo és zero.
 	 */
 	@Test public void siIngressem6000Punt01EnUnCompteBuit_ElSaldoEsZero() {
-		String id;
+		CompteBean compte;
 		
-		id = serveiComptes.crearCompte();
-		assertThrows(ValidationException.class, () -> serveiComptes.ingressar(id, BigDecimal.valueOf(6000.01D)));
-		assertEquals(BigDecimal.ZERO, serveiComptes.saldo(id));
+		compte = serveiComptes.crearCompte();
+		assertThrows(ValidationException.class, () -> serveiComptes.ingressar(compte.getIdCompte(), BigDecimal.valueOf(6000.01D)));
+		assertEquals(VALOR_ZERO, serveiComptes.saldo(compte.getIdCompte()));
 	}
 
 }

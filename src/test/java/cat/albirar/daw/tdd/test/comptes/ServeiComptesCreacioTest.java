@@ -22,11 +22,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.math.BigDecimal;
-
 import org.junit.jupiter.api.Test;
 import org.springframework.util.StringUtils;
 
+import cat.albirar.daw.tdd.comptes.CompteBean;
 import cat.albirar.daw.tdd.comptes.IServeiComptes;
 
 /**
@@ -39,13 +38,13 @@ public class ServeiComptesCreacioTest extends AbstractServeiComptesTest  {
 	 * Quan creem el compte el saldo és zero.
 	 */
 	@Test public void quanCreemElCompte_El_Saldo_EsZero() {
-		String id;
+		CompteBean compte;
 		
-		id = serveiComptes.crearCompte();
+		compte = serveiComptes.crearCompte();
 		// Creació vàlid
-		assertNotNull(id);
-		assertTrue(StringUtils.hasText(id));
+		assertNotNull(compte);
+		assertTrue(StringUtils.hasText(compte.getIdCompte()));
 		// Saldo == 0
-		assertEquals(BigDecimal.ZERO, serveiComptes.saldo(id));
+		assertEquals(VALOR_ZERO, serveiComptes.saldo(compte.getIdCompte()));
 	}
 }
