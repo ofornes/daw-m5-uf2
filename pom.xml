@@ -11,7 +11,7 @@
 
 	<groupId>cat.albirar.daw</groupId>
 	<artifactId>tdd</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<name>tdd</name>
 	<description>Projecte per a la UF2 del M5</description>
 

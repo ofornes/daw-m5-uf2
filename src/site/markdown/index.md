@@ -5,11 +5,12 @@
 **Continguts**
 
 1. [Introducció](#Introducci.C3.B3)
-2. [Estructura](#Estructura)
-3. [Construcció i provatures](#Construcci.C3.B3_i_provatures)
-4. [Primera part de la prova](#Primera_part_de_la_prova)
+2. [Codi](#Codi)
+3. [Estructura](#Estructura)
+4. [Construcció i provatures](#Construcci.C3.B3_i_provatures)
+5. [Primera part de la prova](#Primera_part_de_la_prova)
     1. [Proves addicionals](#Proves_addicionals)
-5. [Segona part de la prova](#Segona_part_de_la_prova)
+6. [Segona part de la prova](#Segona_part_de_la_prova)
     1. [Conclusions](#Conclusions)
 
 ------
@@ -22,6 +23,12 @@ S’ha utilitzat Spring com a framework de desenvolupament per tal d’aprofitar
 
 Per a crear els JavaBeans s'ha utilitzat la llibreria [Lombok](https://projectlombok.org/) que simplifica la implementació i redueix els errors típics de la farragosa i mecànica feina de implementar getters i setters.
 Aquesta utilitat disposa d'un _plugin_ per a diferents IDEs de manera que disposes dels mètodes d'accés a les propietats _on the fly_.
+
+## Codi
+
+El codi de la primera part de la prova és a l’etiqueta [v1](https://github.com/ofornes/daw-m5-uf2/tree/v1).
+
+El codi de la segona part de la prova és a l’etiqueta [v2](https://github.com/ofornes/daw-m5-uf2/tree/v2).
 
 ## Estructura
 
