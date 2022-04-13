@@ -20,8 +20,8 @@ Per a resoldre la prova UF2, s’ha creat un projecte Java amb maven.
 
 S’ha utilitzat Spring com a framework de desenvolupament per tal d’aprofitar els recursos i facilitats que proporciona (IoC, Dependency Injection, etc.)
 
-Per a crear els JavaBeans s'ha utilitzat la llibreria [Lombok](https://projectlombok.org/) que simplifica la implementació i redueix els errors típics de la farragosa i mecànica feina de implementar getters i setters.
-Aquesta utilitat disposa d'un _plugin_ per a diferents IDEs de manera que disposes dels mètodes d'accés a les propietats _on the fly_.
+Per a crear els *JavaBeans* s'ha utilitzat la llibreria [Lombok](https://projectlombok.org/) que simplifica la implementació i redueix els errors típics de la farragosa i mecànica feina de implementar *getters* i *setters*.
+Aquesta utilitat disposa d'un _plugin_ per a diferents IDEs de manera que ofereix els mètodes d'accés a les propietats _on the fly_.
 
 ## Estructura
 
@@ -96,11 +96,11 @@ Així es generarà el codi i s'executaran les provatures
     - No es poden retirar quantitats negatives
         - **Si retirem -100 en un compte amb 500, no ocorre res i el saldo continua sent 500**
     - Les quantitats admeten un màxim de dos decimals de precisió
-        - **Si retirem100.45 en un compte amb 500, el saldo és 399.55**
+        - **Si retirem 100.45 en un compte amb 500, el saldo és 399.55**
         - **Si retirem 100.457 en un compte amb 500, no ocorre res i el saldo continua sent 500**
     - La quantitat màxima que es pot retirar és de 6000
         - **Si retirem 6000.00 d'un compte amb 7000, el saldo és de 1000**
-        - **Si retirem 6000.01 en un compte amb 7000, no ocurre nada i el saldo continua sent 7000**
+        - **Si retirem 6000.01 en un compte amb 7000, no ocorre res i el saldo continua sent 7000**
 - Transferències ([cat.albirar.daw.tdd.test.comptes.ServeiComptesTransferenciesTest](testapidocs/cat/albirar/daw/tdd/test/comptes/ServeiComptesTransferenciesTest.html))
     - **Si fem una transferència de 100 des d'un compte amb 500 a un amb 50, en el primer compte el saldo serà de 400 i en la segona serà de 150**
     - No es poden transferir quantitats negatives
@@ -112,12 +112,12 @@ Així es generarà el codi i s'executaran les provatures
 
 ### Proves addicionals
 
-A la vista dels resultat de la prova de cobertura de codi del servei [ServeiComptesImpl](jacoco/cat.albirar.daw.tdd.comptes.impl/ServeiComptesImpl.html), els valors de cobertura de [saldo](jacoco/cat.albirar.daw.tdd.comptes.impl/ServeiComptesImpl.java.html#L86) i [transferir](jacoco/cat.albirar.daw.tdd.comptes.impl/ServeiComptesImpl.java.html#L131), aconsellan afegir algunes provatures purament orgàniques, que tenen a veure amb la implementació del servei i no pas amb la especificació inicial del mateix. En concret:
+A la vista dels resultat de la prova de cobertura de codi del servei [ServeiComptesImpl](jacoco/cat.albirar.daw.tdd.comptes.impl/ServeiComptesImpl.html), els valors de cobertura de [saldo](jacoco/cat.albirar.daw.tdd.comptes.impl/ServeiComptesImpl.java.html#L86) i [transferir](jacoco/cat.albirar.daw.tdd.comptes.impl/ServeiComptesImpl.java.html#L131), aconsellen afegir algunes provatures purament orgàniques, que tenen a veure amb la implementació del servei i no pas amb la especificació inicial del mateix. En concret:
  - Amb un id de compte inexistent:
     - Demanar saldo
     - Ingressar
     - Retirar
-    - Transferir (en ambdòs sentits)
+    - Transferir (en ambdós sentits)
  - Transferir quantitat superior al saldo del compte origen
 
 Amb aquestes noves provatures, el codi del servei estaria completament cobert i podem tenir la seguretat que totes les situacions estan previstes.
@@ -129,15 +129,15 @@ S'ha creat la classe [CompteBean](apidocs/cat/albirar/daw/tdd/comptes/CompteBean
 
 S'ha mantingut la estructura del servei, però afegint el [CompteBean](apidocs/cat/albirar/daw/tdd/comptes/CompteBean.html) als valors de retorn dels mètodes que abans retornaven saldos o identificadors de compte.
 
-S'ha creat ka classe especial [CompteOperatiuBean](apidocs/cat/albirar/daw/tdd/comptes/CompteOperatiuBean.html) per a operar sobre el saldo de [CompteBean](apidocs/cat/albirar/daw/tdd/comptes/CompteBean.html) (recordem que és immutable ja que és la _visible_ per al client de l'API).
-Aquest bean especial permet al servei operar sobre el saldo d'un compte i implementa alguna part de la lògica de negoci (per exemple el límit màxim de transferència diària).
+S'ha creat la classe especial [CompteOperatiuBean](apidocs/cat/albirar/daw/tdd/comptes/CompteOperatiuBean.html) per a operar sobre el saldo de [CompteBean](apidocs/cat/albirar/daw/tdd/comptes/CompteBean.html) (recordem que és immutable ja que és la _visible_ per al client de l'API).
+Aquest *bean* especial permet al servei operar sobre el saldo d'un compte i implementa alguna part de la lògica de negoci (per exemple el límit màxim de transferència diària).
 
 
 Les provatures s'han adaptat a aquests petits canvis, però la essència s'ha mantingut.
 
 ### Conclusions
 
-Les proves de covertura demostren que la refactorització, amb pocs canvis a les provatures i serveis, han encapsulat millor el funcionament del servei, ja que s'observa un augment del codi covert sense canvis en les provatures.
+Les proves de cobertura demostren que la re-factorització, amb pocs canvis a les provatures i serveis, han encapsulat millor el funcionament del servei, ja que s'observa un augment del codi cobert sense canvis en les provatures.
 
 El disseny d'encapsulament desenvolupat a la segona part, és el més adient als principis OOP.
 
