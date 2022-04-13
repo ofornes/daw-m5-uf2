@@ -19,7 +19,6 @@
 package cat.albirar.daw.tdd.comptes.impl;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
@@ -30,30 +29,31 @@ import javax.validation.constraints.Digits;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Positive;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import cat.albirar.daw.tdd.comptes.CompteBean;
 import cat.albirar.daw.tdd.comptes.CompteInexistentException;
+import cat.albirar.daw.tdd.comptes.CompteOperatiuBean;
 import cat.albirar.daw.tdd.comptes.IServeiComptes;
-import cat.albirar.daw.tdd.comptes.SaldoInsuficientException;
-import cat.albirar.daw.tdd.comptes.LimitDiariTransferenciesExceditExcepcio;
 
 /**
  * Implementació de {@link IServeiComptes}.
  * @author Octavi Forn&amp;eacute;s &lt;mailto:ofornes@albirar.cat[]&gt;
  * @since 0.0.1
+ * @since 1.0.0
  */
 @Service
 @Validated
-<span class="fc" id="L51">public class ServeiComptesImpl implements IServeiComptes {</span>
-<span class="fc" id="L52">	private Map&lt;String, BigDecimal&gt; comptes = null;</span>
-	private Map&lt;LocalDate, Map&lt;String, BigDecimal&gt;&gt; transferencies;
+<span class="fc" id="L50">public class ServeiComptesImpl implements IServeiComptes {</span>
+<span class="fc" id="L51">	private Map&lt;String, CompteOperatiuBean&gt; comptes = null;</span>
 	
 	@Value(&quot;${tdd.maxTransferencies:3000}&quot;)
 	protected BigDecimal MAX_TOTAL_TRANSFERENCIES;
+	
+<span class="fc" id="L56">	private BigDecimal D_100 = BigDecimal.valueOf(100D);</span>
 	/**
 	 * Inicialitza el servei, si no estava inicialitzat.
 	 */
@@ -61,97 +61,86 @@ import cat.albirar.daw.tdd.comptes.LimitDiariTransferenciesExceditExcepcio;
 	public void inicialitzarServei() {
 <span class="pc bpc" id="L62" title="1 of 2 branches missed.">		if(comptes == null) {</span>
 <span class="fc" id="L63">			comptes = Collections.synchronizedMap(new TreeMap&lt;&gt;());</span>
-<span class="fc" id="L64">			transferencies = Collections.synchronizedMap(new TreeMap&lt;&gt;());</span>
 		}
-<span class="fc" id="L66">	}</span>
+<span class="fc" id="L65">	}</span>
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String crearCompte() {
+	public CompteBean crearCompte() {
 		String id;
+		CompteBean c;
 		
 <span class="fc" id="L74">		id = UUID.randomUUID().toString();</span>
-<span class="fc" id="L75">		comptes.put(id, BigDecimal.ZERO);</span>
-<span class="fc" id="L76">		return id;</span>
+<span class="fc" id="L75">		c = CompteBean.builder().idCompte(id).amount(0).build();</span>
+<span class="fc" id="L76">		comptes.put(id, CompteOperatiuBean.builder().compte(c).build());</span>
+<span class="fc" id="L77">		return c;</span>
+	}
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public CompteBean cercarCompte(@NotBlank String idCompte) {
+<span class="fc" id="L84">		return cercarCompteOperatiu(idCompte).getCompte();</span>
+	}
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public BigDecimal saldo(@NotBlank String idCompte) {
+<span class="fc" id="L91">		return cercarCompte(idCompte).getSaldoEuros();</span>
+	}
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public CompteBean ingressar(@NotBlank String compte, @Min(0) @Max(6000) @Digits(integer = 12, fraction = 2) BigDecimal total) {
+		CompteOperatiuBean c;
+		
+<span class="fc" id="L100">		c = cercarCompteOperatiu(compte);</span>
+<span class="fc" id="L101">		c.sumarSaldo(total.multiply(D_100).intValue());</span>
+<span class="fc" id="L102">		return c.getCompte();</span>
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public BigDecimal saldo(@NotBlank String compte) {
-		BigDecimal s;
+	public CompteBean retirar(@NotBlank String compte, @Min(0) @Max(6000) @Digits(integer = 12, fraction = 2) BigDecimal total) {
+		CompteOperatiuBean c;
 		
-<span class="fc" id="L86">		s = comptes.get(compte);</span>
-<span class="pc bpc" id="L87" title="1 of 2 branches missed.">		if(s == null) {</span>
-<span class="nc" id="L88">			throw new CompteInexistentException(compte);</span>
-		}
-<span class="fc" id="L90">		return s;</span>
+<span class="fc" id="L112">		c = cercarCompteOperatiu(compte);</span>
+<span class="fc" id="L113">		c.restarSaldo(total.multiply(D_100).intValue());</span>
+<span class="fc" id="L114">		return c.getCompte();</span>
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public BigDecimal ingressar(@NotBlank String compte, @Min(0) @Max(6000) @Digits(integer = 12, fraction = 2) BigDecimal total) {
-		BigDecimal s;
+	public CompteBean transferir(@NotBlank String compteOrigen, @NotBlank String compteDestinacio, @Min(0) @Max(6000) @Digits(integer = 12, fraction = 2) BigDecimal total) {
+		CompteOperatiuBean cOrig, cDest;
 		
-<span class="fc" id="L100">		s = saldo(compte);</span>
-<span class="fc" id="L101">		s = s.add(total);</span>
-<span class="fc" id="L102">		comptes.put(compte, s);</span>
-<span class="fc" id="L103">		return s;</span>
+<span class="fc" id="L124">		cOrig = cercarCompteOperatiu(compteOrigen);</span>
+<span class="fc" id="L125">		cDest = cercarCompteOperatiu(compteDestinacio);</span>
+<span class="fc" id="L126">		cOrig.transferirSaldo(total.multiply(D_100).intValue(), MAX_TOTAL_TRANSFERENCIES.multiply(D_100).intValue());</span>
+<span class="fc" id="L127">		cDest.sumarSaldo(total.multiply(D_100).intValue());</span>
+<span class="fc" id="L128">		return cDest.getCompte();</span>
 	}
-
 	/**
-	 * {@inheritDoc}
+	 * Cerca el compte operatiu associat amb l'{@code idCompte} indicat.
+	 * @param idCompte L'id de compte
+	 * @return El compte operatiu
+	 * @throws CompteInexistentException Si el compte no existeix pas
 	 */
-	@Override
-	public BigDecimal retirar(@NotBlank String compte, @Min(0) @Max(6000) @Digits(integer = 12, fraction = 2) BigDecimal total) {
-		BigDecimal s;
+	private CompteOperatiuBean cercarCompteOperatiu(String idCompte) {
+		CompteOperatiuBean r;
 		
-<span class="fc" id="L113">		s = saldo(compte);</span>
-<span class="fc bfc" id="L114" title="All 2 branches covered.">		if(s.compareTo(total) &lt; 0) {</span>
-<span class="fc" id="L115">			throw new SaldoInsuficientException();</span>
+<span class="fc" id="L139">		r = comptes.get(idCompte);</span>
+<span class="pc bpc" id="L140" title="1 of 2 branches missed.">		if(r == null) {</span>
+<span class="nc" id="L141">			throw new CompteInexistentException(idCompte);</span>
 		}
-<span class="fc" id="L117">		s = s.subtract(total);</span>
-<span class="fc" id="L118">		comptes.put(compte, s);</span>
-<span class="fc" id="L119">		return s;</span>
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public BigDecimal transferir(@NotBlank String compteOrigen, @NotBlank String compteDestinacio, @Positive @Digits(integer = 12, fraction = 2) BigDecimal total) {
-		BigDecimal s1, s2, sAvui;
-		LocalDate data;
-		Map&lt;String, BigDecimal&gt; tAvui;
-		
-<span class="fc" id="L131">		s1 = saldo(compteOrigen);</span>
-<span class="fc" id="L132">		s2 = saldo(compteDestinacio);</span>
-<span class="pc bpc" id="L133" title="1 of 2 branches missed.">		if(s1.compareTo(total) &lt; 0) {</span>
-<span class="nc" id="L134">			throw new SaldoInsuficientException();</span>
-		}
-<span class="fc" id="L136">		data = LocalDate.now();</span>
-<span class="fc bfc" id="L137" title="All 2 branches covered.">		if( (tAvui = transferencies.get(data)) == null) {</span>
-<span class="fc" id="L138">			tAvui = Collections.synchronizedMap(new TreeMap&lt;&gt;());</span>
-<span class="fc" id="L139">			transferencies.put(data, tAvui);</span>
-		}
-<span class="fc bfc" id="L141" title="All 2 branches covered.">		if( (sAvui = tAvui.get(compteOrigen)) == null) {</span>
-<span class="fc" id="L142">			sAvui = BigDecimal.ZERO;</span>
-		}
-<span class="fc" id="L144">		sAvui = sAvui.add(total);</span>
-<span class="fc bfc" id="L145" title="All 2 branches covered.">		if(MAX_TOTAL_TRANSFERENCIES.compareTo(sAvui) &lt; 0) {</span>
-			// Total assolit
-<span class="fc" id="L147">			throw new LimitDiariTransferenciesExceditExcepcio();</span>
-		}
-<span class="fc" id="L149">		tAvui.put(compteOrigen, sAvui);</span>
-<span class="fc" id="L150">		s1 = s1.subtract(total);</span>
-<span class="fc" id="L151">		s2 = s2.add(total);</span>
-<span class="fc" id="L152">		comptes.put(compteOrigen, s1);</span>
-<span class="fc" id="L153">		comptes.put(compteDestinacio, s2);</span>
-<span class="fc" id="L154">		return s2;</span>
+<span class="fc" id="L143">		return r;</span>
 	}
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>
